@@ -2,23 +2,20 @@
 
 # Overview
 
-SolveMe is an API for a quiz-based application built with FastAPI. It allows users to register, log in, retrieve questions based on their score level, submit answers, and track their progress. The application supports user roles (user and admin) with different levels of access to the API endpoints._
-
+SolveMe is an API for a quiz-based application built with FastAPI. It allows users to register, log in, retrieve questions based on their score level, submit answers, and track their progress. The application supports user roles (user and admin) with different levels of access to the API endpoints.
 
 # Features
 
 User Authentication and Authorization: Signup, login, and secure access to endpoints with JWT tokens.
-*Question Management: CRUD operations for questions.
-*Submission Management: Submit answers to questions and retrieve submission history.
-*User Management: View and manage user accounts.
-
+* Question Management: CRUD operations for questions.
+* Submission Management: Submit answers to questions and retrieve submission history.
+* User Management: View and manage user accounts.
 
 # Getting Started
 
 Prerequisites:
-*Python 3.7+
-*MySQL Database
-
+* Python 3.7+
+* MySQL Database
 
 # Installation
 
