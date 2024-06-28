@@ -24,7 +24,9 @@ Prerequisites:
 
 **Set up a virtual environment:**
 >  python -m venv venv
+
 then
+
 >  source venv/bin/activate
 On Windows use > `venv\Scripts\activate`
 
