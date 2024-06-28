@@ -1,7 +1,7 @@
 import sys
 sys.path.append("..")
 
-from fastapi import Depends, HTTPException, APIRouter, status
+from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 import models
 from database import engine, SessionLocal
@@ -19,6 +19,7 @@ router = APIRouter(
 
 # Create Database Tables
 models.Base.metadata.create_all(bind=engine)
+
 
 # Dependency to get DB session
 def get_db():

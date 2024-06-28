@@ -1,10 +1,9 @@
 import sys
-from fastapi import Depends, APIRouter, HTTPException, status
+from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
 import models
 from database import engine, SessionLocal
-from utils.auth_utils import get_current_user, verify_password, get_password_hash, get_current_admin
+from utils.auth_utils import get_current_user, get_current_admin
 from utils.user_utils import ResponseModel, UserVerification
 from controllers.user_controller import read_all_users, read_user, update_my_password, delete_my_account, make_admin
 sys.path.append("..")

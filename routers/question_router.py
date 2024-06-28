@@ -31,12 +31,12 @@ def get_db():
 
 @router.get("/all")
 async def read_all(user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
-    return await read_all_questions(user, db)
+    return await read_all_questions(db)
 
 
 @router.get("/{question_id}", response_model=Question)
 async def get_by_id(question_id: int, user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
-    return await get_question_by_id(question_id, user, db)
+    return await get_question_by_id(question_id, db)
 
 
 @router.get("/", response_model=QuestionResponse)
@@ -46,14 +46,15 @@ async def ask(user: dict = Depends(get_current_user), db: Session = Depends(get_
 
 @router.post("/", response_model=ResponseModel, status_code=status.HTTP_201_CREATED)
 async def add(question: Question, user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
-    return await add_question(question, user, db)
+    return await add_question(question, db)
 
 
 @router.put("/{question_id}", response_model=ResponseModel)
 async def update(question_id: int, question: Question, user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
-    return await update_question(question_id, question, user, db)
+    return await update_question(question_id, question, db)
 
 
 @router.delete("/{question_id}", response_model=ResponseModel)
 async def delete(question_id: int, user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
-    return await delete_question(question_id, user, db)
+    return await delete_question(question_id, db)
+

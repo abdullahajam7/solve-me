@@ -7,11 +7,11 @@ import models
 from utils.question_utils import Question, QuestionResponse, ResponseModel, get_question_by_score
 
 
-async def read_all_questions(user: dict, db: Session):
+async def read_all_questions(db: Session):
     return db.query(models.Questions).all()
 
 
-async def get_question_by_id(question_id: int, user: dict, db: Session):
+async def get_question_by_id(question_id: int, db: Session):
     question_model = db.query(models.Questions).filter(models.Questions.id == question_id).first()
     if question_model is None:
         raise HTTPException(status_code=404, detail="Question not found")
@@ -38,7 +38,7 @@ async def get_question(user: dict, db: Session):
     return question_response
 
 
-async def add_question(question: Question, user: dict, db: Session):
+async def add_question(question: Question, db: Session):
     model_question = models.Questions(
         question=question.question,
         choices=question.choices,
@@ -51,7 +51,7 @@ async def add_question(question: Question, user: dict, db: Session):
     return ResponseModel(status=status.HTTP_201_CREATED, message="Question added successfully")
 
 
-async def update_question(question_id: int, question: Question, user: dict, db: Session):
+async def update_question(question_id: int, question: Question, db: Session):
     model_question = db.query(models.Questions).filter(models.Questions.id == question_id).first()
     if model_question is None:
         raise HTTPException(status_code=404, detail="Question not found")
@@ -65,7 +65,7 @@ async def update_question(question_id: int, question: Question, user: dict, db: 
     return ResponseModel(status=status.HTTP_200_OK, message="Question updated successfully")
 
 
-async def delete_question(question_id: int, user: dict, db: Session):
+async def delete_question(question_id: int, db: Session):
     model_question = db.query(models.Questions).filter(models.Questions.id == question_id).first()
     if model_question is None:
         raise HTTPException(status_code=404, detail="Question not found")
