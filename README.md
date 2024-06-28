@@ -21,6 +21,7 @@ Prerequisites:
 
 **Clone the repository:**
 > git clone https://github.com/abdullahajam7/solve-me.git
+
 **Set up a virtual environment:**
 >  python -m venv venv
 > source venv/bin/activate  # On Windows use `venv\Scripts\activate`
