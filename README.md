@@ -45,14 +45,14 @@ Open your browser and go to http://127.0.0.1:8000/docs to see the interactive AP
 
 
 **Project Structure**
-*main.py: The entry point of the application. Sets up the FastAPI app and includes routers.
-*models.py: SQLAlchemy models for the database tables.
-*database.py: Database connection setup.
-*routers/: Contains the different route files for authentication, users, questions, and *submissions.
-*auth.py: Handles user authentication and authorization.
-*users.py: User-related endpoints.
-*questions.py: Question-related endpoints.
-*submissions.py: Submission-related endpoints.
+* main.py: The entry point of the application. Sets up the FastAPI app and includes routers.
+* models.py: SQLAlchemy models for the database tables.
+* database.py: Database connection setup.
+* routers/: Contains the different route files for authentication, users, questions, and *submissions.
+* auth.py: Handles user authentication and authorization.
+* users.py: User-related endpoints.
+* questions.py: Question-related endpoints.
+* submissions.py: Submission-related endpoints.
 
 
 # API Endpoints
