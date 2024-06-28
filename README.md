@@ -28,7 +28,10 @@ Prerequisites:
 then
 
 >  source venv/bin/activate
-On Windows use > `venv\Scripts\activate`
+
+On Windows use
+
+> `venv\Scripts\activate`
 
 **Install the required dependencies:**
 > pip install -r requirements.txt
@@ -51,7 +54,7 @@ Open your browser and go to the Swagger Documentation <http://127.0.0.1:8000/doc
 * main.py: The entry point of the application. Sets up the FastAPI app and includes routers.
 * models.py: SQLAlchemy models for the database tables.
 * database.py: Database connection setup.
-* routers/: Contains the different route files for authentication, users, questions, and *submissions.
+* routers/: Contains the different route files for authentication, users, questions, and submissions.
 * auth.py: Handles user authentication and authorization.
 * users.py: User-related endpoints.
 * questions.py: Question-related endpoints.
