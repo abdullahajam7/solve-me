@@ -20,12 +20,13 @@ Prerequisites:
 # Installation
 
 **Clone the repository:**
-* git clone https://github.com/abdullahajam7/solve-me.git
-* Set up a virtual environment: python -m venv venv
-* source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+> git clone https://github.com/abdullahajam7/solve-me.git
+**Set up a virtual environment:**
+>  python -m venv venv
+> source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 
 **Install the required dependencies:**
-pip install -r requirements.txt
+> pip install -r requirements.txt
 
 **Set up the database:**
 * Create a MySQL database.
@@ -34,11 +35,11 @@ pip install -r requirements.txt
 
 # Running the Application:
 **Start the FastAPI server:**
-uvicorn main:app --reload
+> uvicorn main:app --reload
 
 
 **Access the API documentation:**
-Open your browser and go to http://127.0.0.1:8000/docs to see the interactive API documentation.
+Open your browser and go to the Swagger Documentation <http://127.0.0.1:8000/docs> to see the interactive API documentation.
 
 
 **Project Structure**
