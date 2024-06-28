@@ -1,11 +1,11 @@
 # @solve-me
 
-###Overview
+# Overview
 
 SolveMe is an API for a quiz-based application built with FastAPI. It allows users to register, log in, retrieve questions based on their score level, submit answers, and track their progress. The application supports user roles (user and admin) with different levels of access to the API endpoints._
 
 
-###Features
+# Features
 
 User Authentication and Authorization: Signup, login, and secure access to endpoints with JWT tokens.
 *Question Management: CRUD operations for questions.
@@ -13,14 +13,14 @@ User Authentication and Authorization: Signup, login, and secure access to endpo
 *User Management: View and manage user accounts.
 
 
-###Getting Started
+# Getting Started
 
 Prerequisites:
 *Python 3.7+
 *MySQL Database
 
 
-###Installation
+# Installation
 
 **Clone the repository:**
 * git clone https://github.com/abdullahajam7/solve-me.git
@@ -35,7 +35,7 @@ pip install -r requirements.txt
 * Update the database.py file with your database connection details.
 
 
-###Running the Application:
+# Running the Application:
 **Start the FastAPI server:**
 uvicorn main:app --reload
 
@@ -55,7 +55,7 @@ Open your browser and go to http://127.0.0.1:8000/docs to see the interactive AP
 *submissions.py: Submission-related endpoints.
 
 
-###API Endpoints
+# API Endpoints
 **Authentication**
 * POST /auth/signup: Create a new user.
 * POST /auth/login: Log in and obtain a JWT token.
