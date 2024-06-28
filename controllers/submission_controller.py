@@ -1,52 +1,21 @@
 import sys
 sys.path.append("..")
 
-from fastapi import Depends, HTTPException, APIRouter, status
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
 import models
-from database import engine, SessionLocal
-from .auth import get_current_user, get_current_admin
+from utils.submission_utils import SubmitResponseModel
 
 
-# Initialize Router
-router = APIRouter(
-    prefix="/submissions",
-    tags=["submissions"],
-    responses={404: {"description": "Not found"}},
-)
-
-# Create Database Tables
-models.Base.metadata.create_all(bind=engine)
-
-# Dependency to get DB session
-def get_db():
-    try:
-        db = SessionLocal()
-        yield db
-    finally:
-        db.close()
-
-
-class SubmitResponseModel(BaseModel):
-    status: int
-    message: str
-    correct: bool
-
-
-# Routes
-@router.get("/all")
-async def read_all_submissions(user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
+async def read_all_submissions(db: Session):
     return db.query(models.Submissions).all()
 
 
-@router.get("/")
-async def read_game_submissions_by_user(user_id: int, game_number: int, user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
+async def read_game_submissions_by_user(user_id: int, game_number: int, db: Session):
     return db.query(models.Submissions).filter(models.Submissions.game_number == game_number and models.Submissions.user_id == user_id).all()
 
 
-@router.get("/{submission_id}")
-async def get_submission_by_id(submission_id: int, user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
+async def get_submission_by_id(submission_id: int, db: Session):
     submission_model = db.query(models.Submissions).filter(models.Submissions.id == submission_id).first()
     if submission_model is None:
         raise HTTPException(status_code=404, detail="Submission not found")
@@ -54,8 +23,7 @@ async def get_submission_by_id(submission_id: int, user: dict = Depends(get_curr
     return submission_model
 
 
-@router.post("/submit", response_model=SubmitResponseModel)
-async def submit_answer(answer: str, user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+async def submit_answer(answer: str, user: dict, db: Session):
     user_model = db.query(models.Users).filter(models.Users.id == user.get('id')).first()
     if user_model.last_asked_question == 0:
         raise HTTPException(status_code=404, detail="No question asked")
