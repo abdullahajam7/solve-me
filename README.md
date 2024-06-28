@@ -24,7 +24,9 @@ Prerequisites:
 
 **Set up a virtual environment:**
 >  python -m venv venv
-> source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+then
+>  source venv/bin/activate
+On Windows use > `venv\Scripts\activate`
 
 **Install the required dependencies:**
 > pip install -r requirements.txt
