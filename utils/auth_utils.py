@@ -73,7 +73,7 @@ async def get_current_user(token: str = Depends(oath2_bearer), db: Session = Dep
         raise get_user_exception()
 
 
-async def get_current_user_auth(token: str = Depends(oath2_bearer), db: Session = Depends(get_db)):
+async def get_current_user_auth(token: str = Depends(oath2_bearer)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
         user_id: int = payload.get("id")
