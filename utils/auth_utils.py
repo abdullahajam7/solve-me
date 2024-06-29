@@ -43,14 +43,14 @@ def verify_password(plain_password, hashed_password):
 
 
 def authenticate_user(username: str, password: str, db: Session):
-    user = db.query(models.Users).filter(models.Users.username == username).first()
+    user = db.query(models.User).filter(models.User.username == username).first()
     if not user or not verify_password(password, user.hashed_password):
         return False
     return user
 
 
-def create_access_token(username: str, user_id: int, expires_delta: Optional[timedelta] = None):
-    encode = {"sub": username, "id": user_id}
+def create_access_token(role: str, id_user: int, expires_delta: Optional[timedelta] = None):
+    encode = {"role": role, "id_user": id_user}
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
@@ -59,16 +59,12 @@ def create_access_token(username: str, user_id: int, expires_delta: Optional[tim
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-async def get_current_user(token: str = Depends(oath2_bearer), db: Session = Depends(get_db)):
+async def get_current_user(token: str = Depends(oath2_bearer)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
-        user_id: int = payload.get("id")
-        user = db.query(models.Users)\
-            .filter(models.Users.id == user_id)\
-            .first()
-        if user is None:
-            raise get_user_exception()
-        return {"id": user_id, "role": user.role, "score": user.current_score, "games_played": user.games_played, "last_asked_question": user.last_asked_question}
+        id_user: int = payload.get("id_user")
+        role: str = payload.get("role")
+        return {"id_user": id_user, "role": role}
     except JWTError:
         raise get_user_exception()
 
@@ -76,25 +72,20 @@ async def get_current_user(token: str = Depends(oath2_bearer), db: Session = Dep
 async def get_current_user_auth(token: str = Depends(oath2_bearer)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
-        user_id: int = payload.get("id")
-        return {"id": user_id}
+        id_user: int = payload.get("id_user")
+        return {"id_user": id_user}
     except JWTError:
         raise get_user_exception()
 
 
-async def verify_admin(token: str = Depends(oath2_bearer), db: Session = Depends(get_db)):
+async def verify_admin(token: str = Depends(oath2_bearer)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
-        user_id: int = payload.get("id")
-        user = db.query(models.Users) \
-            .filter(models.Users.id == user_id) \
-            .first()
-        if user is None:
-            raise get_user_exception()
-        if user.role != "admin":
+        if payload.get("role") != "admin":
             raise get_admin_exception()
     except JWTError:
         raise get_user_exception()
+    return {"id_user": payload.get("id_user")}
 
 
 def get_user_exception():

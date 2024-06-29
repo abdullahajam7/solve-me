@@ -1,23 +1,22 @@
-# utils/question_utils.py
-
 from pydantic import BaseModel
-from typing import Dict
 from sqlalchemy.orm import Session
-from sqlalchemy import text
+from sqlalchemy import func
 import random
 from fastapi import HTTPException
+
+import models
 
 
 class Question(BaseModel):
     question: str
     choices: dict
-    correct_answer: str
+    correct_answer: int
     level: str
 
 
 class QuestionResponse(BaseModel):
     question: str
-    choices: Dict[str, str]
+    choices: dict
     level: str
 
 
@@ -32,7 +31,26 @@ class SubmitResponseModel(BaseModel):
     correct: bool
 
 
-def get_question_by_score(score: int, user_id: int, game_number: int, db: Session):
+def get_game(id_user: int, db: Session):
+    subquery = db.query(func.max(models.Game.id_game)).filter(models.Game.id_user == id_user).scalar_subquery()
+    game = db.query(models.Game).filter(models.Game.id_user == id_user, models.Game.id_game == subquery).one_or_none()
+
+    if game is None:
+        raise HTTPException(status_code=404, detail="No game started")
+    return game
+
+
+def get_last_asked_question(id_game: int, db: Session):
+    subquery = db.query(func.max(models.Asked_question.id_asked_question)).filter(
+        models.Asked_question.id_game == id_game).scalar_subquery()
+
+    asked_question = db.query(models.Asked_question).filter(
+        models.Asked_question.id_game == id_game, models.Asked_question.id_asked_question == subquery).one_or_none()
+
+    return asked_question
+
+
+def get_question_by_score(id_user: int, score: int, id_game: int, db: Session):
     if score < 30:
         level = "easy"
     elif score < 70:
@@ -40,40 +58,33 @@ def get_question_by_score(score: int, user_id: int, game_number: int, db: Sessio
     else:
         level = "hard"
 
-    # Query to get the number of available records
-    count_query = text(f"""
-        SELECT (
-            (SELECT COUNT(*) FROM questions WHERE level = :level) - 
-            (
-                SELECT COUNT(*) 
-                FROM submissions AS s
-                JOIN questions q ON q.id = s.question_id
-                WHERE q.level = :level AND s.user_id = :user_id AND s.game_number = :game_number
+    total_questions_subquery = db.query(func.count(models.Question.id_question)).filter(
+        models.Question.level == level).scalar_subquery()
+
+    asked_questions_subquery = db.query(func.count(models.Asked_question.id_asked_question)).join(models.Question)\
+        .filter(models.Question.level == level, models.Asked_question.id_game == id_game)\
+        .scalar_subquery()
+
+    # Final query to get the difference
+    count_result = db.query(total_questions_subquery - asked_questions_subquery).scalar()
+
+    if count_result == 0:
+        raise HTTPException(status_code=404, detail="Question not found")
+
+    random_index = random.randint(0, count_result - 1)
+
+    subquery = db.query(models.Question.id_question).filter(
+        models.Question.level == level,
+        ~models.Question.id_question.in_(
+            db.query(models.Asked_question.id_question).join(models.Game).filter(
+                models.Asked_question.id_game == id_game,
+                models.Game.id_user == id_user
             )
-        ) AS res
-    """)
-    count_result = db.execute(count_query, {'level': level, 'user_id': user_id, 'game_number': game_number}).fetchone()
-    available_count = count_result[0] if count_result else 0
-    if available_count == 0:
-        raise HTTPException(status_code=404, detail="Question not found")
-
-    random_index = random.randint(0, available_count - 1)
-
-    # Query to get the random question
-    question_query = text(f"""
-        SELECT id
-        FROM questions 
-        WHERE level = :level
-        AND id NOT IN (
-            SELECT question_id 
-            FROM submissions 
-            WHERE game_number = :game_number AND user_id = :user_id
         )
-        LIMIT 1 OFFSET :random_index
-    """)
-    question_id_model = db.execute(question_query, {'level': level, 'user_id': user_id, 'game_number': game_number, 'random_index': random_index}).fetchone()
+    ).limit(1).offset(random_index).subquery()
 
-    if question_id_model is None:
+    question = db.query(models.Question).filter(models.Question.id_question == subquery.c.id_question).one_or_none()
+    if question is None:
         raise HTTPException(status_code=404, detail="Question not found")
 
-    return question_id_model.id
+    return question

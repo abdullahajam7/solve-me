@@ -1,18 +1,20 @@
+import datetime
 import sys
 sys.path.append("..")
 
 from fastapi import HTTPException, status
+from datetime import datetime
 from sqlalchemy.orm import Session
 import models
-from utils.question_utils import Question, QuestionResponse, ResponseModel, get_question_by_score
+from utils.question_utils import Question, QuestionResponse, get_last_asked_question, get_game, get_question_by_score, ResponseModel
 
 
 async def read_all_questions(db: Session):
-    return db.query(models.Questions).all()
+    return db.query(models.Question).all()
 
 
-async def get_question_by_id(question_id: int, db: Session):
-    question_model = db.query(models.Questions).filter(models.Questions.id == question_id).first()
+async def get_question_by_id(id_question: int, db: Session):
+    question_model = db.query(models.Question).filter(models.Question.id_question == id_question).first()
     if question_model is None:
         raise HTTPException(status_code=404, detail="Question not found")
 
@@ -20,15 +22,34 @@ async def get_question_by_id(question_id: int, db: Session):
 
 
 async def get_question(user: dict, db: Session):
-    question_id = user.get("last_asked_question")
-    if question_id == 0:
-        question_id = get_question_by_score(user.get("score"), user.get("id"), user.get("games_played"), db)
-        user_model = db.query(models.Users).filter(models.Users.id == user.get("id")).first()
+    game = get_game(user.get('id_user'), db)
+    asked_question = get_last_asked_question(game.id_game, db)
+    if asked_question is not None and asked_question.answer is None:
+        question_model = db.query(models.Question).filter(models.Question.id_question == asked_question.id_question).first()
 
-        user_model.last_asked_question = question_id
-        db.commit()
+        if question_model is None:
+            raise HTTPException(status_code=404, detail="Question not found")
 
-    question_model = db.query(models.Questions).filter(models.Questions.id == question_id).first()
+        question_response = QuestionResponse(
+            question=question_model.question,
+            choices=question_model.choices,
+            level=question_model.level
+        )
+        return question_response
+
+    if game.ended_at is not None:
+        raise HTTPException(status_code=400, detail="You need to start a game first")
+    question_model = get_question_by_score(user.get("id_user"), game.score, game.id_game, db)
+
+    asked_question_model = models.Asked_question(
+        id_game=game.id_game,
+        id_question=question_model.id_question,
+        created_at=datetime.utcnow()
+    )
+
+    db.add(asked_question_model)
+    db.commit()
+
     question_response = QuestionResponse(
         question=question_model.question,
         choices=question_model.choices,
@@ -38,12 +59,14 @@ async def get_question(user: dict, db: Session):
     return question_response
 
 
-async def add_question(question: Question, db: Session):
-    model_question = models.Questions(
+async def add_question(question: Question, admin: dict, db: Session):
+    model_question = models.Question(
         question=question.question,
         choices=question.choices,
         correct_answer=question.correct_answer,
-        level=question.level
+        level=question.level,
+        id_user=admin.get('id_user'),
+        created_at=datetime.utcnow()
     )
     db.add(model_question)
     db.commit()
@@ -51,8 +74,8 @@ async def add_question(question: Question, db: Session):
     return ResponseModel(status=status.HTTP_201_CREATED, message="Question added successfully")
 
 
-async def update_question(question_id: int, question: Question, db: Session):
-    model_question = db.query(models.Questions).filter(models.Questions.id == question_id).first()
+async def update_question(id_question: int, question: Question, db: Session):
+    model_question = db.query(models.Question).filter(models.Question.id_question == id_question).first()
     if model_question is None:
         raise HTTPException(status_code=404, detail="Question not found")
 
@@ -65,8 +88,8 @@ async def update_question(question_id: int, question: Question, db: Session):
     return ResponseModel(status=status.HTTP_200_OK, message="Question updated successfully")
 
 
-async def delete_question(question_id: int, db: Session):
-    model_question = db.query(models.Questions).filter(models.Questions.id == question_id).first()
+async def delete_question(id_question: int, db: Session):
+    model_question = db.query(models.Question).filter(models.Question.id_question == id_question).first()
     if model_question is None:
         raise HTTPException(status_code=404, detail="Question not found")
 
