@@ -46,8 +46,8 @@ async def delete_my_account(user: dict, db: Session):
     return ResponseModel(status=status.HTTP_200_OK, message="Account deleted successfully")
 
 
-async def make_admin(user_id: int, db: Session):
-    user_model = db.query(models.User).filter(models.User.id_user == user_id).first()
+async def make_admin(id_user: int, db: Session):
+    user_model = db.query(models.User).filter(models.User.id_user == id_user).first()
     if user_model is None:
         raise HTTPException(status_code=404, detail="User not found")
 

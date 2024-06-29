@@ -6,13 +6,13 @@ from sqlalchemy.orm import Session
 import models
 from database import engine, SessionLocal
 from utils.auth_utils import get_current_user, verify_admin
-from controllers.submission_controller import read_all_submissions, read_game, submit_answer, get_submission_by_id
+from controllers.asked_question_controller import read_all_submissions, read_game, submit_answer, get_submission_by_id
 
 
 # Initialize Router
 router = APIRouter(
-    prefix="/submissions",
-    tags=["submissions"],
+    prefix="/asked_question",
+    tags=["asked_question"],
     responses={404: {"description": "Not found"}},
 )
 
@@ -40,9 +40,9 @@ async def get_game_info(id_game: int, db: Session = Depends(get_db)):
     return await read_game(id_game, db)
 
 
-@router.get("/{submission_id}", dependencies=[Depends(verify_admin)])
-async def get_by_id(submission_id: int, db: Session = Depends(get_db)):
-    return await get_submission_by_id(submission_id, db)
+@router.get("/{id_asked_question}", dependencies=[Depends(verify_admin)])
+async def get_by_id(id_asked_question: int, db: Session = Depends(get_db)):
+    return await get_submission_by_id(id_asked_question, db)
 
 
 @router.post("/submit")

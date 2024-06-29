@@ -30,9 +30,9 @@ async def read_all(db: Session = Depends(get_db)):
     return await read_all_users(db)
 
 
-@router.get("/{user_id}", dependencies=[Depends(verify_admin)])
-async def get_by_id(user_id: int, db: Session = Depends(get_db)):
-    return await read_user(user_id, db)
+@router.get("/{id_user}", dependencies=[Depends(verify_admin)])
+async def get_by_id(id_user: int, db: Session = Depends(get_db)):
+    return await read_user(id_user, db)
 
 
 @router.put("/password", response_model=ResponseModel)
@@ -47,6 +47,6 @@ async def delete_account(user: dict = Depends(get_current_user_auth), db: Sessio
 
 
 @router.put("/admin", response_model=ResponseModel, dependencies=[Depends(verify_admin)])
-async def add_admin(user_id: int, db: Session = Depends(get_db)):
-    return await make_admin(user_id, db)
+async def add_admin(id_user: int, db: Session = Depends(get_db)):
+    return await make_admin(id_user, db)
 

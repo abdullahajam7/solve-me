@@ -5,7 +5,7 @@ sys.path.append("..")
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 import models
-from utils.submission_utils import SubmitResponseModel, get_current_question
+from utils.asked_question_utils import SubmitResponseModel, get_current_question
 from utils.question_utils import get_game
 from datetime import datetime
 
