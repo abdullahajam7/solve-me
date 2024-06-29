@@ -31,18 +31,18 @@ def get_db():
 
 
 # Routes
-@router.get("/all")
-async def read_all(user=Depends(verify_admin), db: Session = Depends(get_db)):
+@router.get("/all", dependencies=[Depends(verify_admin)])
+async def read_all(db: Session = Depends(get_db)):
     return await read_all_submissions(db)
 
 
-@router.get("/")
-async def get_game_submissions_by_user(user_id: int, game_number: int, user=Depends(verify_admin), db: Session = Depends(get_db)):
+@router.get("/", dependencies=[Depends(verify_admin)])
+async def get_game_submissions_by_user(user_id: int, game_number: int, db: Session = Depends(get_db)):
     return await read_game_submissions_by_user(user_id, game_number, db)
 
 
-@router.get("/{submission_id}")
-async def get_by_id(submission_id: int, user=Depends(verify_admin), db: Session = Depends(get_db)):
+@router.get("/{submission_id}", dependencies=[Depends(verify_admin)])
+async def get_by_id(submission_id: int, db: Session = Depends(get_db)):
     return await get_submission_by_id(submission_id, db)
 
 

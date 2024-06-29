@@ -29,13 +29,13 @@ def get_db():
         db.close()
 
 
-@router.get("/all")
-async def read_all(user=Depends(verify_admin), db: Session = Depends(get_db)):
+@router.get("/all", dependencies=[Depends(verify_admin)])
+async def read_all(db: Session = Depends(get_db)):
     return await read_all_questions(db)
 
 
-@router.get("/{question_id}", response_model=Question)
-async def get_by_id(question_id: int, user=Depends(verify_admin), db: Session = Depends(get_db)):
+@router.get("/{question_id}", response_model=Question, dependencies=[Depends(verify_admin)])
+async def get_by_id(question_id: int, db: Session = Depends(get_db)):
     return await get_question_by_id(question_id, db)
 
 
@@ -44,17 +44,17 @@ async def ask(user: dict = Depends(get_current_user), db: Session = Depends(get_
     return await get_question(user, db)
 
 
-@router.post("/", response_model=ResponseModel, status_code=status.HTTP_201_CREATED)
-async def add(question: Question, user=Depends(verify_admin), db: Session = Depends(get_db)):
+@router.post("/", response_model=ResponseModel, status_code=status.HTTP_201_CREATED, dependencies=[Depends(verify_admin)])
+async def add(question: Question, db: Session = Depends(get_db)):
     return await add_question(question, db)
 
 
-@router.put("/{question_id}", response_model=ResponseModel)
-async def update(question_id: int, question: Question, user=Depends(verify_admin), db: Session = Depends(get_db)):
+@router.put("/{question_id}", response_model=ResponseModel, dependencies=[Depends(verify_admin)])
+async def update(question_id: int, question: Question, db: Session = Depends(get_db)):
     return await update_question(question_id, question, db)
 
 
-@router.delete("/{question_id}", response_model=ResponseModel)
-async def delete(question_id: int, user=Depends(verify_admin), db: Session = Depends(get_db)):
+@router.delete("/{question_id}", response_model=ResponseModel, dependencies=[Depends(verify_admin)])
+async def delete(question_id: int, db: Session = Depends(get_db)):
     return await delete_question(question_id, db)
 
