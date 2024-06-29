@@ -68,21 +68,28 @@ Open your browser and go to the Swagger Documentation <http://127.0.0.1:8000/doc
 
 **Users**
 * GET /users/: Get all users (Admin only).
-* GET /users/{user_id}: Get a user by ID (Admin only).
+* GET /users/{id_user}: Get a user by ID (Admin only).
 * PUT /users/password: Update the current user's password.
 * DELETE /users/: Delete the current user's account.
 * PUT /users/admin: Promote a user to admin (Admin only).
 
 **Questions**
 * GET /questions/all: Get all questions (Admin only).
-* GET /questions/{question_id}: Get a question by ID (Admin only).
+* GET /questions/{id_question}: Get a question by ID (Admin only).
 * GET /questions/: Get a question for the current user.
 * POST /questions/: Add a new question (Admin only).
-* PUT /questions/{question_id}: Update a question (Admin only).
-* DELETE /questions/{question_id}: Delete a question (Admin only).
+* PUT /questions/{id_question}: Update a question (Admin only).
+* DELETE /questions/{id_question}: Delete a question (Admin only).
 
-**Submissions**
-* GET /submissions/all: Get all submissions (Admin only).
-* GET /submissions/: Get submissions for a specific game and user (Admin only).
-* GET /submissions/{submission_id}: Get a submission by ID (Admin only).
-* POST /submissions/submit: Submit an answer to the asked question.
+**Asked_Questions**
+* GET /asked_questions/all: Get all asked_questions (Admin only).
+* GET /asked_questions/: Get asked_questions for a specific game passed by params (Admin only).
+* GET /asked_questions/{id_asked_question}: Get an asked_question by ID (Admin only).
+* POST /asked_questions/submit: Submit an answer to the asked question.
+
+
+**Games**
+* GET /games/all: Get all games stats (Admin only).
+* GET /games/: Get games stats for a specific id_user passed by params (Admin only).
+* GET /games/{id_game}: Get a game stats by ID (Admin only).
+* POST /games/: starts a game for the current logged in user.
