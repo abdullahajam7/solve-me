@@ -4,7 +4,7 @@ from fastapi import Depends, APIRouter, status
 from sqlalchemy.orm import Session
 import models
 from database import engine, SessionLocal
-from utils.auth_utils import get_current_user, get_current_admin
+from utils.auth_utils import get_current_user, verify_admin
 from utils.question_utils import Question, QuestionResponse, ResponseModel
 from controllers.question_controller import read_all_questions, get_question, get_question_by_id
 from controllers.question_controller import update_question, delete_question, add_question
@@ -30,12 +30,12 @@ def get_db():
 
 
 @router.get("/all")
-async def read_all(user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
+async def read_all(user=Depends(verify_admin), db: Session = Depends(get_db)):
     return await read_all_questions(db)
 
 
 @router.get("/{question_id}", response_model=Question)
-async def get_by_id(question_id: int, user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
+async def get_by_id(question_id: int, user=Depends(verify_admin), db: Session = Depends(get_db)):
     return await get_question_by_id(question_id, db)
 
 
@@ -45,16 +45,16 @@ async def ask(user: dict = Depends(get_current_user), db: Session = Depends(get_
 
 
 @router.post("/", response_model=ResponseModel, status_code=status.HTTP_201_CREATED)
-async def add(question: Question, user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
+async def add(question: Question, user=Depends(verify_admin), db: Session = Depends(get_db)):
     return await add_question(question, db)
 
 
 @router.put("/{question_id}", response_model=ResponseModel)
-async def update(question_id: int, question: Question, user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
+async def update(question_id: int, question: Question, user=Depends(verify_admin), db: Session = Depends(get_db)):
     return await update_question(question_id, question, db)
 
 
 @router.delete("/{question_id}", response_model=ResponseModel)
-async def delete(question_id: int, user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
+async def delete(question_id: int, user=Depends(verify_admin), db: Session = Depends(get_db)):
     return await delete_question(question_id, db)
 

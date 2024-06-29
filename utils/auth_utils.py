@@ -62,20 +62,39 @@ def create_access_token(username: str, user_id: int, expires_delta: Optional[tim
 async def get_current_user(token: str = Depends(oath2_bearer), db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
-        username: str = payload.get("sub")
         user_id: int = payload.get("id")
-        user: models.Users = db.query(models.Users).filter(models.Users.username == username).first()
+        user = db.query(models.Users)\
+            .filter(models.Users.id == user_id)\
+            .first()
         if user is None:
             raise get_user_exception()
-        return {"username": username, "id": user_id, "role": user.role, "score": user.current_score, "games_played": user.games_played, "last_asked_question": user.last_asked_question}
+        return {"id": user_id, "role": user.role, "score": user.current_score, "games_played": user.games_played, "last_asked_question": user.last_asked_question}
     except JWTError:
         raise get_user_exception()
 
 
-async def get_current_admin(user: dict = Depends(get_current_user)):
-    if user.get("role") != "admin":
-        raise get_admin_exception()
-    return user
+async def get_current_user_auth(token: str = Depends(oath2_bearer), db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        user_id: int = payload.get("id")
+        return {"id": user_id}
+    except JWTError:
+        raise get_user_exception()
+
+
+async def verify_admin(token: str = Depends(oath2_bearer), db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        user_id: int = payload.get("id")
+        user = db.query(models.Users) \
+            .filter(models.Users.id == user_id) \
+            .first()
+        if user is None:
+            raise get_user_exception()
+        if user.role != "admin":
+            raise get_admin_exception()
+    except JWTError:
+        raise get_user_exception()
 
 
 def get_user_exception():

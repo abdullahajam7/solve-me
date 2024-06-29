@@ -5,7 +5,7 @@ from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 import models
 from database import engine, SessionLocal
-from utils.auth_utils import get_current_user, get_current_admin
+from utils.auth_utils import get_current_user, verify_admin
 from utils.submission_utils import SubmitResponseModel
 from controllers.submission_controller import read_all_submissions, read_game_submissions_by_user, submit_answer, get_submission_by_id
 
@@ -32,17 +32,17 @@ def get_db():
 
 # Routes
 @router.get("/all")
-async def read_all(user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
+async def read_all(user=Depends(verify_admin), db: Session = Depends(get_db)):
     return await read_all_submissions(db)
 
 
 @router.get("/")
-async def get_game_submissions_by_user(user_id: int, game_number: int, user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
+async def get_game_submissions_by_user(user_id: int, game_number: int, user=Depends(verify_admin), db: Session = Depends(get_db)):
     return await read_game_submissions_by_user(user_id, game_number, db)
 
 
 @router.get("/{submission_id}")
-async def get_by_id(submission_id: int, user: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
+async def get_by_id(submission_id: int, user=Depends(verify_admin), db: Session = Depends(get_db)):
     return await get_submission_by_id(submission_id, db)
 
 
