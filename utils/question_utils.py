@@ -1,10 +1,22 @@
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from datetime import datetime
 from sqlalchemy import func
+from typing import List
 import random
 from fastapi import HTTPException
 
 import models
+
+
+class QuestionItem(BaseModel):
+    id_question: int
+    level: str
+    question: str
+
+
+class QuestionsResponseModel(BaseModel):
+    questions: List[QuestionItem]
 
 
 class Question(BaseModel):
@@ -12,6 +24,16 @@ class Question(BaseModel):
     choices: dict
     correct_answer: int
     level: str
+
+
+class QuestionAdminResponseModel(BaseModel):
+    id_question: int
+    question: str
+    choices: dict
+    correct_answer: int
+    level: str
+    auther: str
+    created_at: datetime
 
 
 class QuestionResponse(BaseModel):

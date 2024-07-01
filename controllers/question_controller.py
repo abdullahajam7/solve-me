@@ -6,19 +6,36 @@ from fastapi import HTTPException, status
 from datetime import datetime
 from sqlalchemy.orm import Session
 import models
-from utils.question_utils import Question, QuestionResponse, get_last_asked_question, get_game, get_question_by_score, ResponseModel
+from utils.question_utils import Question, QuestionResponse, get_last_asked_question,\
+    get_game, get_question_by_score, ResponseModel,\
+    QuestionsResponseModel, QuestionItem, QuestionAdminResponseModel
 
 
-async def read_all_questions(db: Session):
-    return db.query(models.Question).all()
+async def read_all_questions(db: Session) -> QuestionsResponseModel:
+    questions = db.query(models.Question.id_question, models.Question.question, models.Question.level).all()
+    question_list = [QuestionItem(id_question=question.id_question,
+                                  question=question.question,
+                                  level=question.level)
+                     for question in questions]
+    return QuestionsResponseModel(questions=question_list)
 
 
-async def get_question_by_id(id_question: int, db: Session):
+async def get_question_by_id(id_question: int, db: Session) -> QuestionAdminResponseModel:
     question_model = db.query(models.Question).filter(models.Question.id_question == id_question).first()
     if question_model is None:
         raise HTTPException(status_code=404, detail="Question not found")
+    user = db.query(models.User.username).filter(models.User.id_user == question_model.id_user).first()
 
-    return question_model
+    question_response = QuestionAdminResponseModel(
+        id_question=question_model.id_question,
+        question=question_model.question,
+        choices=question_model.choices,
+        level=question_model.level,
+        correct_answer=question_model.correct_answer,
+        auther=user.username,
+        created_at=question_model.created_at
+    )
+    return question_response
 
 
 async def get_question(user: dict, db: Session):

@@ -5,9 +5,9 @@ from sqlalchemy.orm import Session
 import models
 from database import engine, SessionLocal
 from utils.auth_utils import get_current_user, verify_admin
-from utils.question_utils import Question, QuestionResponse, ResponseModel
-from controllers.question_controller import read_all_questions, get_question, get_question_by_id
-from controllers.question_controller import update_question, delete_question, add_question
+from utils.question_utils import Question, QuestionResponse, ResponseModel, QuestionsResponseModel
+from controllers.question_controller import read_all_questions, get_question, get_question_by_id,\
+    update_question, delete_question, add_question, QuestionAdminResponseModel
 
 # Initialize Router
 router = APIRouter(
@@ -29,12 +29,12 @@ def get_db():
         db.close()
 
 
-@router.get("/all", dependencies=[Depends(verify_admin)])
+@router.get("/all", response_model=QuestionsResponseModel, dependencies=[Depends(verify_admin)])
 async def read_all(db: Session = Depends(get_db)):
     return await read_all_questions(db)
 
 
-@router.get("/{id_question}", dependencies=[Depends(verify_admin)])
+@router.get("/{id_question}", response_model=QuestionAdminResponseModel, dependencies=[Depends(verify_admin)])
 async def get_by_id(id_question: int, db: Session = Depends(get_db)):
     return await get_question_by_id(id_question, db)
 
