@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 import models
 from database import engine, SessionLocal
 from utils.auth_utils import get_current_user, verify_admin
+from utils.game_utils import ResponseModel
 from controllers.game_controller import read_game_by_id, read_all_games, start_game, read_all_games_by_user
 
 
@@ -45,6 +46,6 @@ async def get_game_info(id_game: int, db: Session = Depends(get_db)):
     return await read_game_by_id(id_game, db)
 
 
-@router.post("/")
+@router.post("/", response_model=ResponseModel)
 async def new_game(user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
     return await start_game(user.get("id_user"), db)
